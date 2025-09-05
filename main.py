@@ -1,33 +1,20 @@
 # python
 import sys
-from crawl import crawl_page
+import crawl
+import asyncio  
 
-def main():
-    if len(sys.argv) < 2:
-        print("no website provided")
-        sys.exit(1)
-    if len(sys.argv) > 2:
-        print("too many arguments provided")
-        sys.exit(1)
+async def main_async():
+    url = sys.argv[1]
+    max_concurrency = int(sys.argv[2])
+    max_pages = int(sys.argv[3]) 
+    page_data = await crawl.crawl_site_async(url, max_concurrency, max_pages)
+    for data in page_data.values():
+        if data is None:
+            continue
+        print(data["url"], data["h1"])       
+        
+    
+    
+    
+if __name__ == "__main__": asyncio.run(main_async())
 
-    base_url = sys.argv[1]
-    print(f"starting crawl of: {base_url}")
-    
-    
-    try:
-        page_data = crawl_page(base_url)
-        print("\n---Collected Data---\n")
-        print(f"Number of pages found: {len(page_data)}\n")
-        
-        for url, data in page_data.items():
-            print(f"URL: {url}")
-            print(f" header: {data['h1']}")
-            
-        
-        sys.exit(0)
-    except Exception as e:
-        print(f"Error fetching HTML: {str(e)}")
-        sys.exit(1)
-    
-if __name__ == "__main__":
-    main()
